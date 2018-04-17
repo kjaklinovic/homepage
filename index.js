@@ -1,3 +1,4 @@
+const SEARCH_DELAY = 300;
 const KEY_CODES = {
   ARR_UP: 38,
   ARR_DN: 40,
@@ -7,24 +8,106 @@ const KEY_CODES = {
   J: 74,
   H: 72,
   L: 76,
-  ENTER: 13
+  ENTER: 13,
+  ESC: 27,
+  TAB: 9
 };
+
+const searchEl = document.getElementById('search');
+const suggestionsEl = document.getElementById('suggestions');
+const linksEl = document.getElementById('links');
+
+const suggestionTemplate = document.getElementById('suggestion-template');
+
 
 function search(query) {
   document.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
 }
 
 function searchKeyPress(e) {
-  if (e.keyCode === KEY_CODES.ENTER) {
-    search(e.currentTarget.value);
+  const query = e.target.value;
+  const keyCode = e.keyCode;
+  const target = e.target;
+
+  if (keyCode === KEY_CODES.ENTER && query) {
+    search(query);
+  } else if (keyCode === KEY_CODES.TAB || keyCode === KEY_CODES.ESC) {
+    clearSuggestions();
+  } else if (suggestionsEl.classList.contains('has-suggestions')) {
+    let selectedSuggestion;
+    e.preventDefault();
+
+    switch (keyCode) {
+      case KEY_CODES.ARR_UP:
+        selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.firstElementChild;
+        const prevEl = selectedSuggestion.previousElementSibling || selectedSuggestion.parentElement.lastElementChild;
+        selectedSuggestion.classList.remove('is-focused');
+        prevEl.classList.add('is-focused');
+        searchEl.value = prevEl.innerHTML;
+        break;
+
+      case KEY_CODES.ARR_DN:
+        selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.lastElementChild;
+        const nextEl = selectedSuggestion.nextElementSibling || selectedSuggestion.parentElement.firstElementChild;
+        selectedSuggestion.classList.remove('is-focused');
+        nextEl.classList.add('is-focused');
+        searchEl.value = nextEl.innerHTML;
+        break;
+    }
   }
 }
 
-const searchEl = document.getElementById('search');
-const linksEl = document.getElementById('links');
+function queryGoogleSuggestions(query) {
+  if (query) {
+    const suggestionScriptEl = document.createElement('script');
+    suggestionScriptEl.src = `https://suggestqueries.google.com/complete/search?client=firefox&format=json&callback=showSuggestions&hl=en&q=${encodeURIComponent(query)}`;
+    document.body.appendChild(suggestionScriptEl);
+    document.body.removeChild(suggestionScriptEl);
+  } else {
+    clearSuggestions();
+  }
+}
 
-searchEl.addEventListener('keydown', searchKeyPress);
-linksEl.addEventListener('keydown', (e) => {
+function showSuggestions(response) {
+  const query = response[0];
+  const suggestions = response[1] || [];
+
+  suggestionsEl.innerHTML = '';
+  if (suggestions.length) {
+    if (query !== suggestions[0]) {
+      suggestions.unshift(query);
+    }
+
+    suggestions.map((suggestion) => {
+      suggestionTemplate.content.firstElementChild.innerHTML = suggestion;
+      suggestionsEl.appendChild(document.importNode(suggestionTemplate.content, true));
+      return document.importNode(suggestionTemplate.content, true);
+    });
+
+    suggestionsEl.classList.add('has-suggestions');
+  }
+}
+
+function clearSuggestions() {
+  suggestionsEl.classList.remove('has-suggestions');
+  suggestionsEl.innerHTML = '';
+}
+
+function suggestionClick(monitoredEl, delegateClassName, e) {
+  let element = e.target;
+  do {
+    if (element.classList.contains(delegateClassName)) {
+      search(element.innerHTML);
+      searchEl.value = element.innerHTML;
+      clearSuggestions();
+      break;
+    }
+
+    element = element.parentNode;
+  } while(element !== monitoredEl)
+}
+
+function handleLinkNavigation(e) {
   const keyCode = e.keyCode;
   const target = e.target;
   const origIndex = Array.from(target.parentElement.children).indexOf(target);
@@ -58,4 +141,18 @@ linksEl.addEventListener('keydown', (e) => {
       nextRubricEl.children[Math.min(origIndex, nextRubricEl.children.length - 1)].focus();
       break;
   }
+}
+
+let timeout;
+
+searchEl.addEventListener('keydown', searchKeyPress);
+// searchEl.addEventListener('blur', clearSuggestions);
+suggestionsEl.addEventListener('click', suggestionClick.bind(null, suggestionsEl, 'search__suggestion'));
+searchEl.addEventListener('input', (e) => {
+  clearTimeout(timeout);
+  const value = e.target.value;
+  if (value) {
+    timeout = setTimeout(queryGoogleSuggestions.bind(null, value), SEARCH_DELAY);
+  }
 });
+linksEl.addEventListener('keydown', handleLinkNavigation);
