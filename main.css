@@ -1,0 +1,53 @@
+:root {
+  --base-bg-color: #383838;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body, .main {
+  height: 100%;
+}
+
+html {
+  background-color: var(--base-bg-color);
+}
+
+body {
+  font-family: Roboto, Ubuntu, 'Open Sans', 'Helvetica Neue', sans-serif
+}
+
+
+
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main .content {
+  max-width: 1200px;
+  width: 100%;
+  padding: 16px;
+}
+
+.content {
+}
+
+.search {
+  width: 100%;
+  padding: 8px;
+  background: red;
+}
+
+.search .search__input {
+  width: 100%;
+}
+
+.files {
+  display: flex;
+
+}
