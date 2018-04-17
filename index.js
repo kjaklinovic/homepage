@@ -10,6 +10,7 @@ const KEY_CODES = {
   L: 76,
   ENTER: 13,
   ESC: 27,
+  SPACE: 32,
   TAB: 9
 };
 
@@ -115,7 +116,6 @@ function handleLinkNavigation(e) {
   const keyCode = e.keyCode;
   const target = e.target;
   const origIndex = Array.from(target.parentElement.children).indexOf(target);
-  e.preventDefault();
 
   switch (keyCode) {
     // UP
@@ -146,9 +146,14 @@ function handleLinkNavigation(e) {
       nextRubricEl.children[Math.min(origIndex, nextRubricEl.children.length - 1)].focus();
       break;
 
-    case KEY_CODES.TAB:
-      searchEl.focus();
+    case KEY_CODES.SPACE:
+      target.click();
       break;
+
+    // case KEY_CODES.TAB:
+    //   e.preventDefault();
+    //   searchEl.focus();
+    //   break;
   }
 }
 
