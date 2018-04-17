@@ -34,26 +34,8 @@ function searchKeyPress(e) {
   } else if (keyCode === KEY_CODES.TAB || keyCode === KEY_CODES.ESC) {
     clearSuggestions();
   } else if (suggestionsEl.classList.contains('has-suggestions')) {
-    let selectedSuggestion;
     e.preventDefault();
-
-    switch (keyCode) {
-      case KEY_CODES.ARR_UP:
-        selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.firstElementChild;
-        const prevEl = selectedSuggestion.previousElementSibling || selectedSuggestion.parentElement.lastElementChild;
-        selectedSuggestion.classList.remove('is-focused');
-        prevEl.classList.add('is-focused');
-        searchEl.value = prevEl.innerHTML;
-        break;
-
-      case KEY_CODES.ARR_DN:
-        selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.lastElementChild;
-        const nextEl = selectedSuggestion.nextElementSibling || selectedSuggestion.parentElement.firstElementChild;
-        selectedSuggestion.classList.remove('is-focused');
-        nextEl.classList.add('is-focused');
-        searchEl.value = nextEl.innerHTML;
-        break;
-    }
+    navigateSuggestions(keyCode)
   }
 }
 
@@ -107,10 +89,33 @@ function suggestionClick(monitoredEl, delegateClassName, e) {
   } while(element !== monitoredEl)
 }
 
+function navigateSuggestions(keyCode) {
+  let selectedSuggestion;
+
+  switch (keyCode) {
+    case KEY_CODES.ARR_UP:
+      selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.firstElementChild;
+      const prevEl = selectedSuggestion.previousElementSibling || selectedSuggestion.parentElement.lastElementChild;
+      selectedSuggestion.classList.remove('is-focused');
+      prevEl.classList.add('is-focused');
+      searchEl.value = prevEl.innerHTML;
+      break;
+
+    case KEY_CODES.ARR_DN:
+      selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.lastElementChild;
+      const nextEl = selectedSuggestion.nextElementSibling || selectedSuggestion.parentElement.firstElementChild;
+      selectedSuggestion.classList.remove('is-focused');
+      nextEl.classList.add('is-focused');
+      searchEl.value = nextEl.innerHTML;
+      break;
+  }
+}
+
 function handleLinkNavigation(e) {
   const keyCode = e.keyCode;
   const target = e.target;
   const origIndex = Array.from(target.parentElement.children).indexOf(target);
+  e.preventDefault();
 
   switch (keyCode) {
     // UP
@@ -140,13 +145,16 @@ function handleLinkNavigation(e) {
       const nextRubricEl = target.parentElement.nextElementSibling || target.parentElement.parentElement.firstElementChild;;
       nextRubricEl.children[Math.min(origIndex, nextRubricEl.children.length - 1)].focus();
       break;
+
+    case KEY_CODES.TAB:
+      searchEl.focus();
+      break;
   }
 }
 
 let timeout;
 
 searchEl.addEventListener('keydown', searchKeyPress);
-// searchEl.addEventListener('blur', clearSuggestions);
 suggestionsEl.addEventListener('click', suggestionClick.bind(null, suggestionsEl, 'search__suggestion'));
 searchEl.addEventListener('input', (e) => {
   clearTimeout(timeout);
