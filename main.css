@@ -6,14 +6,11 @@
   box-sizing: border-box;
 }
 
-:root, .body, .main {
-  height: 100%;
-}
-
 :root {
-  background-color: var(--background);
   line-height: 1.15;
   -webkit-text-size-adjust: 100%;
+  background-color: var(--background);
+  height: 100%;
 }
 
 .body {
@@ -22,6 +19,7 @@
   align-items: center;
   justify-content: center;
   margin: 0;
+  min-height: 100%;
 }
 
 .body .content {
