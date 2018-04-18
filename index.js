@@ -166,6 +166,8 @@ searchEl.addEventListener('input', (e) => {
   const value = e.target.value;
   if (value) {
     timeout = setTimeout(queryGoogleSuggestions.bind(null, value), SEARCH_DELAY);
+  } else {
+    clearSuggestions();
   }
 });
 linksEl.addEventListener('keydown', handleLinkNavigation);
