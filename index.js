@@ -34,7 +34,7 @@ function searchKeyPress(e) {
     search(query);
   } else if (keyCode === KEY_CODES.TAB || keyCode === KEY_CODES.ESC) {
     clearSuggestions();
-  } else if (suggestionsEl.classList.contains('has-suggestions')) {
+  } else if ((keyCode === KEY_CODES.ARR_UP || keyCode === KEY_CODES.ARR_DN) && suggestionsEl.classList.contains('has-suggestions')) {
     e.preventDefault();
     navigateSuggestions(keyCode)
   }
