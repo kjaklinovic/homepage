@@ -163,7 +163,7 @@ searchEl.addEventListener('keydown', searchKeyPress);
 suggestionsEl.addEventListener('click', suggestionClick.bind(null, suggestionsEl, 'search__suggestion'));
 searchEl.addEventListener('input', (e) => {
   clearTimeout(timeout);
-  const value = e.target.value;
+  const value = e.target.value.trim();
   if (value) {
     timeout = setTimeout(queryGoogleSuggestions.bind(null, value), SEARCH_DELAY);
   } else {
