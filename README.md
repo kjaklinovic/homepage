@@ -1,6 +1,7 @@
 # Ranger ispired homepage
 
 This is ranger ispired browser homepage. It support vim like navigation and Google suggestions.
+Try it here: [live preview](https://vulgrim.github.io/homepage/).
 
 ### Usage
 
