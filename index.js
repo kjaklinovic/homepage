@@ -1,4 +1,4 @@
-const SEARCH_DELAY = 300;
+const SEARCH_DELAY = 250;
 const KEY_CODES = {
   ARR_UP: 38,
   ARR_DN: 40,
@@ -14,105 +14,170 @@ const KEY_CODES = {
   TAB: 9
 };
 
-const searchEl = document.getElementById('search');
-const suggestionsEl = document.getElementById('suggestions');
-const linksEl = document.getElementById('links');
-
-const suggestionTemplate = document.getElementById('suggestion-template');
-
-
-function search(query) {
-  document.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+function qs(selector, scope) {
+  return (scope || document).querySelector(selector);
 }
 
-function searchKeyPress(e) {
-  const query = e.target.value;
-  const keyCode = e.keyCode;
-  const target = e.target;
-
-  if (keyCode === KEY_CODES.ENTER && query) {
-    search(query);
-  } else if (keyCode === KEY_CODES.TAB || keyCode === KEY_CODES.ESC) {
-    clearSuggestions();
-  } else if ((keyCode === KEY_CODES.ARR_UP || keyCode === KEY_CODES.ARR_DN) && suggestionsEl.classList.contains('has-suggestions')) {
-    e.preventDefault();
-    navigateSuggestions(keyCode)
+function debounce(func, time) {
+  return () => {
+    clearTimeout(func.timeout);
+    func.timeout = setTimeout(func, time);
   }
 }
 
-function queryGoogleSuggestions(query) {
-  if (query) {
+function $on(element, type, callback) {
+  element.addEventListener(type, callback);
+}
+
+function $delegate(element, type, selector, callback) {
+  const dispatchEvent = event => {
+    const targetElement = event.target;
+    const potentialElements = element.querySelectorAll(selector);
+    let i = potentialElements.length;
+
+    while (i--) {
+      if (potentialElements[i] === targetElement) {
+        callback.call(targetElement, event);
+        break;
+      }
+    }
+  };
+
+  $on(element, type, dispatchEvent);
+}
+
+class SearchView {
+  constructor() {
+    this.suggestionTemplate = qs('#suggestion-template');
+    this.$search = qs('#search');
+    this.$suggestions = qs('#suggestions');
+  }
+
+  setQuery(value) {
+    this.$search.value = value;
+  }
+
+  getQuery() {
+    return this.$search.value;
+  }
+
+  showSuggestions(suggestions) {
+    const suggestionsHTML = suggestions.map(suggestion => `<div class="js-suggestion search__suggestion">${suggestion}</div>`).join('');
+    this.$suggestions.innerHTML = suggestionsHTML;
+    this.$suggestions.classList.add('has-suggestions');
+  }
+
+  clearSuggestions() {
+    this.$suggestions.classList.remove('has-suggestions');
+    this.$suggestions.innerHTML = '';
+  }
+
+  hasSuggestions() {
+    return this.$suggestions.classList.contains('has-suggestions');
+  }
+
+  focusPreviousSuggestion() {
+    const selectedSuggestion = qs('.is-focused', this.$suggestions) || this.$suggestions.firstElementChild;
+    const prevEl = selectedSuggestion.previousElementSibling || selectedSuggestion.parentElement.lastElementChild;
+
+    selectedSuggestion.classList.remove('is-focused');
+    prevEl.classList.add('is-focused');
+    return prevEl.innerHTML;
+  }
+
+  focusNextSuggestion() {
+    const selectedSuggestion = qs('.is-focused', this.$suggestions) || this.$suggestions.lastElementChild;
+    const nextEl = selectedSuggestion.nextElementSibling || selectedSuggestion.parentElement.firstElementChild;
+
+    selectedSuggestion.classList.remove('is-focused');
+    nextEl.classList.add('is-focused');
+    return nextEl.innerHTML;
+  }
+
+  bindSearchKeyDown(handler) {
+    $on(this.$search, 'keydown', handler);
+  }
+
+  bindSearchInput(handler) {
+    $on(this.$search, 'input', debounce(handler, SEARCH_DELAY));
+  }
+
+  bindSuggestionClick(handler) {
+    $delegate(this.$suggestions, 'click', '.js-suggestion', handler);
+  }
+}
+
+class SearchController {
+  constructor(searchView) {
+    this.searchView = searchView;
+    this.searchView.bindSearchKeyDown(this.searchKeyDownHandler.bind(this));
+    this.searchView.bindSearchInput(this.searchInputHandler.bind(this));
+    this.searchView.bindSuggestionClick(this.suggestionClickHandler.bind(this));
+  }
+
+  fetchGoogleSuggestions(query) {
     const suggestionScriptEl = document.createElement('script');
-    suggestionScriptEl.src = `https://www.google.com/complete/search?client=firefox&format=json&callback=showSuggestions&hl=en&q=${encodeURIComponent(query)}`;
+    suggestionScriptEl.src = `https://www.google.com/complete/search?client=firefox&format=json&callback=searchController.handleSuggestionsResponse&hl=en&q=${encodeURIComponent(query)}`;
     document.body.appendChild(suggestionScriptEl);
     document.body.removeChild(suggestionScriptEl);
-  } else {
-    clearSuggestions();
   }
-}
 
-function showSuggestions(response) {
-  const query = response[0];
-  const suggestions = response[1] || [];
+  handleSuggestionsResponse(response) {
+    const query = response[0];
+    const suggestions = response[1] || [];
 
-  suggestionsEl.innerHTML = '';
-  if (suggestions.length) {
-    if (query !== suggestions[0]) {
-      suggestions.unshift(query);
+    if (suggestions.length) {
+      if (query !== suggestions[0]) {
+        suggestions.unshift(query);
+      }
+
+      this.searchView.showSuggestions(suggestions);
+    } else {
+      this.searchView.clearSuggestions();
     }
-
-    suggestions.map((suggestion) => {
-      suggestionTemplate.content.firstElementChild.innerHTML = suggestion;
-      suggestionsEl.appendChild(document.importNode(suggestionTemplate.content, true));
-      return document.importNode(suggestionTemplate.content, true);
-    });
-
-    suggestionsEl.classList.add('has-suggestions');
   }
-}
 
-function clearSuggestions() {
-  suggestionsEl.classList.remove('has-suggestions');
-  suggestionsEl.innerHTML = '';
-}
+  searchKeyDownHandler(e) {
+    const query = this.searchView.getQuery().trim();
+    const keyCode = e.keyCode;
 
-function suggestionClick(monitoredEl, delegateClassName, e) {
-  let element = e.target;
-  do {
-    if (element.classList.contains(delegateClassName)) {
-      search(element.innerHTML);
-      searchEl.value = element.innerHTML;
-      clearSuggestions();
-      break;
+    if (keyCode === KEY_CODES.ENTER && query) {
+      this.search(query);
+    } else if (keyCode === KEY_CODES.TAB || keyCode === KEY_CODES.ESC) {
+      this.searchView.clearSuggestions();
+    } else if (this.searchView.hasSuggestions()) {
+      if (keyCode === KEY_CODES.ARR_UP) {
+        e.preventDefault();
+        this.searchView.setQuery(this.searchView.focusPreviousSuggestion());
+      } else if (keyCode === KEY_CODES.ARR_DN) {
+        e.preventDefault();
+        this.searchView.setQuery(this.searchView.focusNextSuggestion());
+      }
     }
+  }
 
-    element = element.parentNode;
-  } while(element !== monitoredEl)
-}
+  searchInputHandler(e) {
+    const query = this.searchView.getQuery().trim();
+    if (query) {
+      this.fetchGoogleSuggestions(query);
+    } else {
+      this.searchView.clearSuggestions();
+    }
+  }
 
-function navigateSuggestions(keyCode) {
-  let selectedSuggestion;
+  suggestionClickHandler(e) {
+    this.search(e.target.innerHTML);
+  }
 
-  switch (keyCode) {
-    case KEY_CODES.ARR_UP:
-      selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.firstElementChild;
-      const prevEl = selectedSuggestion.previousElementSibling || selectedSuggestion.parentElement.lastElementChild;
-      selectedSuggestion.classList.remove('is-focused');
-      prevEl.classList.add('is-focused');
-      searchEl.value = prevEl.innerHTML;
-      break;
-
-    case KEY_CODES.ARR_DN:
-      selectedSuggestion = suggestionsEl.getElementsByClassName('is-focused')[0] || suggestionsEl.lastElementChild;
-      const nextEl = selectedSuggestion.nextElementSibling || selectedSuggestion.parentElement.firstElementChild;
-      selectedSuggestion.classList.remove('is-focused');
-      nextEl.classList.add('is-focused');
-      searchEl.value = nextEl.innerHTML;
-      break;
+  search(query) {
+    document.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
   }
 }
 
-function handleLinkNavigation(e) {
+const searchView = new SearchView();
+const searchController = new SearchController(searchView);
+
+qs('#links').addEventListener('keydown', (e) => {
   const keyCode = e.keyCode;
   const target = e.target;
   const origIndex = Array.from(target.parentElement.children).indexOf(target);
@@ -149,25 +214,5 @@ function handleLinkNavigation(e) {
     case KEY_CODES.SPACE:
       target.click();
       break;
-
-    // case KEY_CODES.TAB:
-    //   e.preventDefault();
-    //   searchEl.focus();
-    //   break;
-  }
-}
-
-let timeout;
-
-searchEl.addEventListener('keydown', searchKeyPress);
-suggestionsEl.addEventListener('click', suggestionClick.bind(null, suggestionsEl, 'search__suggestion'));
-searchEl.addEventListener('input', (e) => {
-  clearTimeout(timeout);
-  const value = e.target.value.trim();
-  if (value) {
-    timeout = setTimeout(queryGoogleSuggestions.bind(null, value), SEARCH_DELAY);
-  } else {
-    clearSuggestions();
   }
 });
-linksEl.addEventListener('keydown', handleLinkNavigation);
