@@ -43,7 +43,7 @@ function searchKeyPress(e) {
 function queryGoogleSuggestions(query) {
   if (query) {
     const suggestionScriptEl = document.createElement('script');
-    suggestionScriptEl.src = `https://suggestqueries.google.com/complete/search?client=firefox&format=json&callback=showSuggestions&hl=en&q=${encodeURIComponent(query)}`;
+    suggestionScriptEl.src = `https://www.google.com/complete/search?client=firefox&format=json&callback=showSuggestions&hl=en&q=${encodeURIComponent(query)}`;
     document.body.appendChild(suggestionScriptEl);
     document.body.removeChild(suggestionScriptEl);
   } else {
