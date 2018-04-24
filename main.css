@@ -15,6 +15,7 @@
 
 .body {
   font-family: monospace;
+  background-color: var(--background);
   display: flex;
   align-items: center;
   justify-content: center;
