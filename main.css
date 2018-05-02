@@ -93,7 +93,7 @@
 }
 
 .search .search__clock {
-  color: var(--color1);
+  color: var(--color15);
   margin-left: 16px;
   cursor: default;
 }
@@ -141,137 +141,139 @@
   background: none;
 }
 
-.link.link-1 {
-  color: var(--color1);
-}
-
-.link.link-1:hover, .link.link-1:focus {
+.link.color-1:hover, .link.color-1:focus {
   color: var(--background);
   background-color: var(--color1);
 }
 
-.link.link-2 {
-  color: var(--color2);
-}
-
-.link.link-2:hover, .link.link-2:focus {
+.link.color-2:hover, .link.color-2:focus {
   color: var(--background);
   background-color: var(--color2);
 }
 
-.link.link-3 {
-  color: var(--color3);
-}
-
-.link.link-3:hover, .link.link-3:focus {
+.link.color-3:hover, .link.color-3:focus {
   color: var(--background);
   background-color: var(--color3);
 }
 
-.link.link-4 {
-  color: var(--color4);
-}
-
-.link.link-4:hover, .link.link-4:focus {
+.link.color-4:hover, .link.color-4:focus {
   color: var(--background);
   background-color: var(--color4);
 }
 
-.link.link-5 {
-  color: var(--color5);
-}
-
-.link.link-5:hover, .link.link-5:focus {
+.link.color-5:hover, .link.color-5:focus {
   color: var(--background);
   background-color: var(--color5);
 }
 
-.link.link-6 {
-  color: var(--color6);
-}
-
-.link.link-6:hover, .link.link-6:focus {
+.link.color-6:hover, .link.color-6:focus {
   color: var(--background);
   background-color: var(--color6);
 }
 
-.link.link-7 {
-  color: var(--color7);
-}
-
-.link.link-7:hover, .link.link-7:focus {
+.link.color-7:hover, .link.color-7:focus {
   color: var(--background);
   background-color: var(--color7);
 }
 
-.link.link-8 {
-  color: var(--color8);
-}
-
-.link.link-8:hover, .link.link-8:focus {
+.link.color-8:hover, .link.color-8:focus {
   color: var(--background);
   background-color: var(--color8);
 }
 
-.link.link-9 {
-  color: var(--color9);
-}
-
-.link.link-9:hover, .link.link-9:focus {
+.link.color-9:hover, .link.color-9:focus {
   color: var(--background);
   background-color: var(--color9);
 }
 
-.link.link-10 {
-  color: var(--color10);
-}
-
-.link.link-10:hover, .link.link-10:focus {
+.link.color-10:hover, .link.color-10:focus {
   color: var(--background);
   background-color: var(--color10);
 }
 
-.link.link-11 {
-  color: var(--color11);
-}
-
-.link.link-11:hover, .link.link-11:focus {
+.link.color-11:hover, .link.color-11:focus {
   color: var(--background);
   background-color: var(--color11);
 }
 
-.link.link-12 {
-  color: var(--color12);
-}
-
-.link.link-12:hover, .link.link-12:focus {
+.link.color-12:hover, .link.color-12:focus {
   color: var(--background);
   background-color: var(--color12);
 }
 
-.link.link-13 {
-  color: var(--color13);
-}
-
-.link.link-13:hover, .link.link-13:focus {
+.link.color-13:hover, .link.color-13:focus {
   color: var(--background);
   background-color: var(--color13);
 }
 
-.link.link-14 {
-  color: var(--color14);
-}
-
-.link.link-14:hover, .link.link-14:focus {
+.link.color-14:hover, .link.color-14:focus {
   color: var(--background);
   background-color: var(--color14);
 }
 
-.link.link-15 {
-  color: var(--color15);
-}
-
-.link.link-15:hover, .link.link-15:focus {
+.link.color-15:hover, .link.color-15:focus {
   color: var(--background);
   background-color: var(--color15);
+}
+
+/* COLOR CLASSES */
+
+.color-1 {
+  color: var(--color1);
+}
+
+.color-2 {
+  color: var(--color2);
+}
+
+.color-3 {
+  color: var(--color3);
+}
+
+.color-4 {
+  color: var(--color4);
+}
+
+.color-5 {
+  color: var(--color5);
+}
+
+.color-6 {
+  color: var(--color6);
+}
+
+.color-7 {
+  color: var(--color7);
+}
+
+.color-8 {
+  color: var(--color8);
+}
+
+.color-9 {
+  color: var(--color9);
+}
+
+.color-10 {
+  color: var(--color10);
+}
+
+.color-11 {
+  color: var(--color11);
+}
+
+.color-12 {
+  color: var(--color12);
+}
+
+.color-13 {
+  color: var(--color13);
+}
+
+.color-14 {
+  color: var(--color14);
+}
+
+.color-15 {
+  color: var(--color15);
 }
