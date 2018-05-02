@@ -126,15 +126,15 @@
   white-space: nowrap;
 }
 
-.link .fa,
-.link .fas,
-.link .far,
-.link .fal,
-.link .fab {
+.link i[class^='fa'] {
   font-size: 1em;
   width: 20px;
   text-align: center;
-  margin-right: 8px;
+  margin: 0 8px;
+}
+
+.link i[class^='fa']:first-child {
+  margin-left: 0;
 }
 
 .link::selection {
