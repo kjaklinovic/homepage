@@ -119,6 +119,7 @@
 .link .far,
 .link .fal,
 .link .fab {
+  font-size: 1em;
   width: 20px;
   text-align: center;
   margin-right: 8px;
