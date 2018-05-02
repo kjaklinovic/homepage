@@ -1,3 +1,4 @@
+@import './fontawesome/css/fontawesome-all.min.css';
 @import './colors.css';
 
 *,
@@ -103,12 +104,24 @@
 
 
 .link {
-  display: block;
+  display: flex;
+  align-items: center;
+  height: 24px;
   padding: 2px 0px 2px 8px;
   color: var(--color1);
   text-decoration: none;
   outline: 0;
   white-space: nowrap;
+}
+
+.link .fa,
+.link .fas,
+.link .far,
+.link .fal,
+.link .fab {
+  width: 20px;
+  text-align: center;
+  margin-right: 8px;
 }
 
 .link::selection {
