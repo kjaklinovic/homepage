@@ -16,3 +16,8 @@ Press <kbd>TAB</kbd> when search bar is focused to focus the area bellow. Naviga
 
 ### TODO
 - [ ] Add custom commands
+- [ ] Integrate weather API
+- [ ] Implement clock
+- [ ] Implement TODO pane
+- [ ] Customizeable homepage build
+
