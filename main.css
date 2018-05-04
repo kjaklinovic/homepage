@@ -1,4 +1,4 @@
-@import './fontawesome/css/fontawesome-all.min.css';
+@import './vendor/fontawesome/css/fontawesome-all.min.css';
 @import './colors.css';
 
 *,
@@ -35,8 +35,6 @@
   margin: 4px;
   background: var(--color0);
   position: relative;
-  display: flex;
-  align-items: center;
 }
 
 .search .search__input {
@@ -90,16 +88,6 @@
 .search .search__suggestion.is-focused {
   color: var(--background);
   background-color: var(--color7);
-}
-
-.search .search__clock {
-  color: var(--color15);
-  margin-left: 16px;
-  cursor: default;
-}
-
-.search .search__clock::selection {
-  background: none;
 }
 
 .links {

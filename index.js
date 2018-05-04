@@ -1,5 +1,4 @@
 const SEARCH_DELAY = 250;
-const SECOND = 1000;
 const KEY_CODES = {
   ARR_UP: 38,
   ARR_DN: 40,
@@ -217,28 +216,3 @@ qs('#links').addEventListener('keydown', (e) => {
       break;
   }
 });
-
-function updateTime(time) {
-  const formattedTime = [
-    time.getHours().toString().padStart(2, '0'),
-    time.getMinutes().toString().padStart(2, '0'),
-    time.getSeconds().toString().padStart(2, '0')
-  ].join(':');
-
-  $clock.innerHTML = formattedTime;
-}
-
-const $clock = qs('#clock');
-let ticking = false;
-updateTime(new Date());
-
-
-setInterval(() => {
-  if (!ticking) {
-    ticking = true;
-    requestAnimationFrame(() => {
-      updateTime(new Date());
-      ticking = false;
-    });
-  }
-}, SECOND);
