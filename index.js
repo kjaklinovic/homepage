@@ -1,3 +1,9 @@
+const SEARCH_ENGINES = {
+  GOOGLE: Symbol('Google'),
+  DUCKDUCKGO: Symbol('Google')
+};
+
+const SEARCH_ENGINE = SEARCH_ENGINES.GOOGLE;
 const SEARCH_DELAY = 250;
 const KEY_CODES = {
   ARR_UP: 38,
@@ -107,17 +113,14 @@ class SearchView {
   }
 }
 
-class SearchController {
-  constructor(searchView) {
-    this.searchView = searchView;
-    this.searchView.bindSearchKeyDown(this.searchKeyDownHandler.bind(this));
-    this.searchView.bindSearchInput(this.searchInputHandler.bind(this));
-    this.searchView.bindSuggestionClick(this.suggestionClickHandler.bind(this));
+class GoogleSearchService {
+  set responseHandler(handler) {
+    this.handler = handler;
   }
 
-  fetchGoogleSuggestions(query) {
+  fetchSearchSuggestions(query) {
     const suggestionScriptEl = document.createElement('script');
-    suggestionScriptEl.src = `https://www.google.com/complete/search?client=firefox&format=json&callback=searchController.handleSuggestionsResponse&hl=en&q=${encodeURIComponent(query)}`;
+    suggestionScriptEl.src = `https://www.google.com/complete/search?client=firefox&format=json&callback=autocompleteCallback&hl=en&q=${encodeURIComponent(query)}`;
     document.body.appendChild(suggestionScriptEl);
     document.body.removeChild(suggestionScriptEl);
   }
@@ -125,12 +128,50 @@ class SearchController {
   handleSuggestionsResponse(response) {
     const query = response[0];
     const suggestions = response[1] || [];
+    this.handler(suggestions);
+  }
 
+  search(query) {
+    document.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  }
+}
+
+class DuckDuckGoSearchService {
+  set responseHandler(handler) {
+    this.handler = handler;
+  }
+
+  fetchSearchSuggestions(query) {
+    const suggestionScriptEl = document.createElement('script');
+    suggestionScriptEl.src = `https://duckduckgo.com/ac?callback=autocompleteCallback&q=${query}`;
+    document.body.appendChild(suggestionScriptEl);
+    document.body.removeChild(suggestionScriptEl);
+  }
+
+  handleSuggestionsResponse(response) {
+    const suggestions = response.map(suggestion => suggestion.phrase);
+    this.handler(suggestions);
+  }
+
+  search(query) {
+    document.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+  }
+}
+
+class SearchController {
+  constructor(searchView, searchService) {
+    this.searchView = searchView;
+    this.searchService = searchService;
+
+    this.searchView.bindSearchKeyDown(this.searchKeyDownHandler.bind(this));
+    this.searchView.bindSearchInput(this.searchInputHandler.bind(this));
+    this.searchView.bindSuggestionClick(this.suggestionClickHandler.bind(this));
+
+    this.searchService.responseHandler = this.suggestionsResponseHandler.bind(this);
+  }
+
+  suggestionsResponseHandler(suggestions) {
     if (suggestions.length) {
-      if (query !== suggestions[0]) {
-        suggestions.unshift(query);
-      }
-
       this.searchView.showSuggestions(suggestions);
     } else {
       this.searchView.clearSuggestions();
@@ -159,7 +200,7 @@ class SearchController {
   searchInputHandler(e) {
     const query = this.searchView.getQuery().trim();
     if (query) {
-      this.fetchGoogleSuggestions(query);
+      this.searchService.fetchSearchSuggestions(query);
     } else {
       this.searchView.clearSuggestions();
     }
@@ -170,12 +211,25 @@ class SearchController {
   }
 
   search(query) {
-    document.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    this.searchService.search(query);
   }
 }
 
+let searchService;
+switch (SEARCH_ENGINE) {
+  case SEARCH_ENGINES.GOOGLE:
+    searchService = new GoogleSearchService();
+    break;
+  case SEARCH_ENGINES.DUCKDUCKGO:
+    searchService = new DuckDuckGoSearchService();
+    break;
+  default:
+    break;
+}
+
 const searchView = new SearchView();
-const searchController = new SearchController(searchView);
+const searchController = new SearchController(searchView, searchService);
+const autocompleteCallback = searchService.handleSuggestionsResponse.bind(searchService);
 
 qs('#links').addEventListener('keydown', (e) => {
   const keyCode = e.keyCode;
