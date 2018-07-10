@@ -1,6 +1,6 @@
 const SEARCH_ENGINES = {
   GOOGLE: Symbol('Google'),
-  DUCKDUCKGO: Symbol('Google')
+  DUCKDUCKGO: Symbol('DuckDuckGo')
 };
 
 const SEARCH_ENGINE = SEARCH_ENGINES.GOOGLE;
