@@ -2,7 +2,7 @@
 
 This is ranger ispired browser homepage. It supports vim like navigation and Google suggestions. It is compatible with [pywals](https://github.com/dylanaraps/pywal) colors.css.
 
-Try it here: [live preview](https://vulgrim.github.io/homepage/).
+Try it here: [live preview](https://kjaklinovic.github.io/homepage/).
 
 ### Usage
 
